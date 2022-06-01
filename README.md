@@ -36,3 +36,14 @@ Some useful commands:</br>
 > - `export MONGODB_ROOT_PASSWORD=$(kubectl get secret --namespace default idea-mongodb -o jsonpath="{.data.mongodb-root-password}" | base64 --decode)`
 > - `kubectl run --namespace default idea-mongodb-client --rm --tty -i --restart='Never' --env="MONGODB_ROOT_PASSWORD=$MONGODB_ROOT_PASSWORD" --image docker.io/bitnami/mongodb:5.0.8-debian-10-r10 --command -- bash`
 > - `mongosh admin --host "idea-mongodb" --authenticationDatabase admin -u root -p $MONGODB_ROOT_PASSWORD`
+
+## Before deployment
+> Changes rules of the firebase firestore database and replace it by:
+> `// Allow read/write access on all documents to any user signed in to the application
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}`
